@@ -290,8 +290,8 @@ func (ct *ContentType) GetVersion() int {
 }
 
 // List return a content type collection
-func (service *ContentTypesService) List(spaceID string) *Collection {
-	path := fmt.Sprintf("/spaces/%s/content_types", spaceID)
+func (service *ContentTypesService) List(env *Environment) *Collection {
+	path := fmt.Sprintf("/spaces/%s/environments/%s/content_types", env.Sys.Space.Sys.ID, env.Sys.ID)
 	method := "GET"
 
 	req, err := service.c.newRequest(method, path, nil, nil)
@@ -307,8 +307,8 @@ func (service *ContentTypesService) List(spaceID string) *Collection {
 }
 
 // ListActivated return a content type collection, with only activated content types
-func (service *ContentTypesService) ListActivated(spaceID string) *Collection {
-	path := fmt.Sprintf("/spaces/%s/public/content_types", spaceID)
+func (service *ContentTypesService) ListActivated(env *Environment) *Collection {
+	path := fmt.Sprintf("/spaces/%s/environments/%s/public/content_types", env.Sys.Space.Sys.ID, env.Sys.ID)
 	method := "GET"
 
 	req, err := service.c.newRequest(method, path, nil, nil)
@@ -323,21 +323,10 @@ func (service *ContentTypesService) ListActivated(spaceID string) *Collection {
 	return col
 }
 
-// Get fetched a content type specified by `contentTypeID`
-func (service *ContentTypesService) Get(spaceID, contentTypeID string) (*ContentType, error) {
-	path := fmt.Sprintf("/spaces/%s/content_types/%s", spaceID, contentTypeID)
-
-	return service.doGet(path)
-}
-
-// GetFromEnv a content type by `contentTypeID` from an environment
-func (service *ContentTypesService) GetFromEnv(env *Environment, contentTypeID string) (*ContentType, error) {
+// Get a content type by `contentTypeID` from an environment
+func (service *ContentTypesService) Get(env *Environment, contentTypeID string) (*ContentType, error) {
 	path := fmt.Sprintf("/spaces/%s/environments/%s/content_types/%s", env.Sys.Space.Sys.ID, env.Sys.ID, contentTypeID)
 
-	return service.doGet(path)
-}
-
-func (service *ContentTypesService) doGet(path string) (*ContentType, error) {
 	req, err := service.c.newRequest("GET", path, nil, nil)
 	if err != nil {
 		return nil, err
@@ -351,21 +340,8 @@ func (service *ContentTypesService) doGet(path string) (*ContentType, error) {
 	return &ct, nil
 }
 
-// Upsert updates or creates a new content type
-func (service *ContentTypesService) Upsert(spaceID string, ct *ContentType) error {
-	var path string
-
-	if ct.Sys != nil && ct.Sys.ID != "" {
-		path = fmt.Sprintf("/spaces/%s/content_types/%s", spaceID, ct.Sys.ID)
-	} else {
-		path = fmt.Sprintf("/spaces/%s/content_types/%s", spaceID, ct.Name)
-	}
-
-	return service.doUpsert(path, ct)
-}
-
-// UpsertEnv a content type for an environment
-func (service *ContentTypesService) UpsertEnv(env *Environment, ct *ContentType) error {
+// Upsert a content type for an environment
+func (service *ContentTypesService) Upsert(env *Environment, ct *ContentType) error {
 	var path string
 
 	path = fmt.Sprintf("/spaces/%s/environments/%s", env.Sys.Space.Sys.ID, env.Sys.ID)
@@ -376,10 +352,6 @@ func (service *ContentTypesService) UpsertEnv(env *Environment, ct *ContentType)
 		path = fmt.Sprintf("%s/content_types/%s", path, ct.Name)
 	}
 
-	return service.doUpsert(path, ct)
-}
-
-func (service *ContentTypesService) doUpsert(path string, ct *ContentType) error {
 	bytesArray, err := json.Marshal(ct)
 	if err != nil {
 		return err
@@ -395,19 +367,10 @@ func (service *ContentTypesService) doUpsert(path string, ct *ContentType) error
 	return service.c.do(req, ct)
 }
 
-// Delete the content_type
-func (service *ContentTypesService) Delete(spaceID string, ct *ContentType) error {
-	path := fmt.Sprintf("/spaces/%s/content_types/%s", spaceID, ct.Sys.ID)
-	return service.doDelete(path, ct)
-}
-
-// DeleteFromEnv a content type from an environment
-func (service *ContentTypesService) DeleteFromEnv(env *Environment, ct *ContentType) error {
+// Delete a content type from an environment
+func (service *ContentTypesService) Delete(env *Environment, ct *ContentType) error {
 	path := fmt.Sprintf("/spaces/%s/environments/%s/content_types/%s", env.Sys.Space.Sys.ID, env.Sys.ID, ct.Sys.ID)
-	return service.doDelete(path, ct)
-}
 
-func (service *ContentTypesService) doDelete(path string, ct *ContentType) error {
 	method := "DELETE"
 
 	req, err := service.c.newRequest(method, path, nil, nil)
@@ -422,8 +385,8 @@ func (service *ContentTypesService) doDelete(path string, ct *ContentType) error
 }
 
 // Activate the contenttype, a.k.a publish
-func (service *ContentTypesService) Activate(spaceID string, ct *ContentType) error {
-	path := fmt.Sprintf("/spaces/%s/content_types/%s/published", spaceID, ct.Sys.ID)
+func (service *ContentTypesService) Activate(env *Environment, ct *ContentType) error {
+	path := fmt.Sprintf("/spaces/%s/environments/%s/content_types/%s/published", env.Sys.Space.Sys.ID, env.Sys.ID, ct.Sys.ID)
 	method := "PUT"
 
 	req, err := service.c.newRequest(method, path, nil, nil)
@@ -438,8 +401,8 @@ func (service *ContentTypesService) Activate(spaceID string, ct *ContentType) er
 }
 
 // Deactivate the contenttype, a.k.a unpublish
-func (service *ContentTypesService) Deactivate(spaceID string, ct *ContentType) error {
-	path := fmt.Sprintf("/spaces/%s/content_types/%s/published", spaceID, ct.Sys.ID)
+func (service *ContentTypesService) Deactivate(env *Environment, ct *ContentType) error {
+	path := fmt.Sprintf("/spaces/%s/environments/%s/content_types/%s/published", env.Sys.Space.Sys.ID, env.Sys.ID, ct.Sys.ID)
 	method := "DELETE"
 
 	req, err := service.c.newRequest(method, path, nil, nil)
