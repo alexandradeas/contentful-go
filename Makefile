@@ -16,7 +16,7 @@ test:
 	./tools/test.sh
 
 lint:
-	./tools/lint.sh
+	staticcheck
 
 build:
 	go build -o contentful-go

@@ -22,14 +22,14 @@ type Controls struct {
 	FieldID         string            `json:"fieldId"`
 	WidgetNameSpace string            `json:"widgetNamespace"`
 	WidgetID        string            `json:"widgetId"`
-	Settings        map[string]string `json:"settings, omitempty"`
+	Settings        map[string]string `json:"settings,omitempty"`
 }
 
 // Sidebar model
 type Sidebar struct {
 	WidgetNameSpace string            `json:"widgetNamespace"`
 	WidgetID        string            `json:"widgetId"`
-	Settings        map[string]string `json:"settings, omitempty"`
+	Settings        map[string]string `json:"settings,omitempty"`
 	Disabled        bool              `json:"disabled"`
 }
 
